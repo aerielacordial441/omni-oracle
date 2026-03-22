@@ -149,7 +149,7 @@ Each discovery is a **Hypothesis Card**:
 | Level | What | How |
 |-------|------|-----|
 | **L1** Unit | Each function does what it claims | 46 unit tests |
-| **L2** Domain | Results are plausible in the domain | 11 tests with values from published sources (Granger 1969, Toda-Yamamoto 1995, FRED docs) |
+| **L2** Domain | Results are plausible in the domain | 11 tests with values from published sources (Granger 1969, FRED documented relationships) |
 | **L3** Property | Statistical invariants hold for any valid input | 6 property-based tests (Hypothesis library) |
 | **L4** Golden | Pipeline output is stable and human-reviewed | Smoke test snapshot, approved once |
 | **L5** Real data | System rediscovers known truths from literature | 10 tests against documented economic relationships |
